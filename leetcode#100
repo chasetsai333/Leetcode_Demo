@@ -1,0 +1,3103 @@
+//#region #1 Two Sum
+/** 
+ * @param {number[]} nums
+ * @param {number} target
+ * @return {number[]}
+ */
+var twoSum = function (nums, target) {
+    let result = [];
+    let numLen = nums.length;
+    nums.some((num_1, i, self) => {
+        for (let j = (i + 1); j < numLen; j++) {
+            const num_2 = self[j];
+            if ((num_1 + num_2) === target) {
+                result = [i, j];
+                return true;
+            }
+        }
+        if (result.length > 0)
+            return true;
+    })
+    return result;
+};
+var twoSum = function (nums, target) {
+    let mapper = new Map([[nums[0], 0]]);
+    for (let i = 1; i < nums.length; i++) {
+        let num = nums[i];
+        if (mapper.has(target - num)) return [mapper.get(target - num), i];
+        else mapper.set(num, i);
+    }
+};
+//#endregion
+
+//#region #2 Add Two Numbers
+/** 
+ * Definition for singly-linked list.
+ * function ListNode(val, next) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.next = (next===undefined ? null : next)
+ * }
+ * @param {ListNode} l1
+ * @param {ListNode} l2
+ * @return {ListNode}
+ */
+var addTwoNumbers = function (l1, l2) {
+    function convertToNumber(listNode) {
+        let result = "";
+        current = listNode;
+        while (current !== null) {
+            result = `${current.val}` + result;
+            current = current.next;
+        }
+        return BigInt(result);
+    }
+    let sumNumber = (convertToNumber(l1) + convertToNumber(l2)).toString();
+    let arrNumber = Array.from(sumNumber);
+    if (arrNumber.length > 1) {
+        return arrNumber.reduce((prev, curr) => {
+            if (typeof (prev) === 'string') {
+                prev = new ListNode(prev);
+            }
+            curr = new ListNode(curr);
+            curr.next = prev;
+            return curr;
+        });
+    } else {
+        return new ListNode(arrNumber[0]);
+    }
+};
+//#endregion
+
+//#region #3 Longest Substring Without Repeating Characters
+/** 
+ * @param {string} s
+ * @return {number}
+ */
+var lengthOfLongestSubstring = function (s) {
+    let result = [0];
+    let stringArray = Array.from(s);
+    let matchArray = [];
+    stringArray.forEach(str => {
+        let index = matchArray.indexOf(str);
+        if (index >= 0) {
+            result.push(matchArray.length);
+            matchArray.splice(0, (matchArray.indexOf(str) + 1));
+            matchArray.push(str);
+        }
+        else {
+            matchArray.push(str);
+        }
+    });
+    result.push(matchArray.length);
+    return Math.max(...result);
+};
+//#endregion
+
+//#region #4 Median of Two Sorted Arrays
+/** 
+ * @param {number[]} nums1
+ * @param {number[]} nums2
+ * @return {number}
+ */
+var findMedianSortedArrays = function (nums1, nums2) {
+    let result = 0;
+    let allNums = nums1.concat(nums2);
+    allNums.sort((a, b) => a - b);
+    let medianNum = (allNums.length) / 2;
+    if(medianNum%1===0){
+        result = (allNums[medianNum-1]+allNums[medianNum])/2;
+    }else{
+        medianNum = Math.floor(medianNum);
+        result = allNums[medianNum];
+    }
+    return result;
+};
+//#endregion
+
+//#region #5 Longest Palindromic Substring
+/** 
+ * @param {string} s
+ * @return {string}
+ */
+var longestPalindrome = function (s) {
+    function expandAroundCenter(s, left, right) {
+        let L = left,
+            R = right;
+        while (L > -1 && R < s.length) {
+            if (s[L] !== s[R]) break;
+            L--;
+            R++;
+        }
+        return R - L - 1;
+    }
+
+    if (s.length <= 1) return s;
+    let start = 0,
+        end = 0;
+    for (let i = 0; i < s.length; i++) {
+        const len1 = expandAroundCenter(s, i, i);
+        const len2 = expandAroundCenter(s, i, i + 1);
+        const len = Math.max(len1, len2);
+        if (len > end - start) {
+            start = i - (len - 1) / 2;
+            end = i + len / 2;
+        }
+    }
+    return s.slice(Math.ceil(start), end + 1);
+};
+//#endregion
+
+//#region #10 Regular Expression Matching
+/** 
+ * @param {string} s
+ * @param {string} p
+ * @return {boolean}
+ */
+var isMatch = function (s, p) {
+    if (p.length === 0) return s == '';
+    if (p.length > 1 && p[1] == '*') {
+        return isMatch(s, p.slice(2)) || (!s.length == 0 && (s[0] == p[0] || p[0] == '.') && isMatch(s.slice(1), p));
+    } else {
+        return !s.length == 0 && (s[0] == p[0] || p[0] == '.') && isMatch(s.slice(1), p.slice(1));
+    }
+};
+//#endregion
+
+//#region #11 Container With Most Water
+/** 
+ * @param {number[]} height
+ * @return {number}
+ */
+var maxArea = function (height) {
+    let result = 0;
+    let left = 0;
+    let right = (height.length - 1);
+    while (left < right) {
+        let h1 = height[left];
+        let h2 = height[right];
+        result = Math.max(result, (Math.min(h1, h2) * (right - left)));
+        h1 < h2 ? left++ : right--;
+    }
+    return result;
+};
+//#endregion
+
+//#region #15 3Sum
+/** 
+ * @param {number[]} nums
+ * @return {number[][]}
+ */
+var threeSum = function (nums) {
+    let result = [];
+    if (nums.length < 3) {
+        return result;
+    }
+    nums.sort((a, b) => a - b);
+    for (let i = 0; i < nums.length - 2; i++) {
+        if (i == 0 || (i > 0 && nums[i] != nums[i - 1])) {
+            let j = i + 1;
+            let k = nums.length - 1;
+            let target = 0 - nums[i];
+            while (j < k) {
+                if (nums[j] + nums[k] == target) {
+                    result.push([nums[i], nums[j], nums[k]]);
+                    while (j < k && nums[j] == nums[j + 1]) j++;
+                    while (j < k && nums[k] == nums[k - 1]) k--;
+                    j++; k--;
+                } else if (nums[j] + nums[k] < target)
+                    ++j;
+                else
+                    --k;
+            }
+        }
+    }
+    return result;
+};
+//#endregion
+
+//#region #17 Letter Combinations of a Phone Number
+/** 
+ * @param {string} digits
+ * @return {string[]}
+ */
+var letterCombinations = function (digits) {
+    const digitsMapper = {
+        '2': "abc", '3': "def", '4': "ghi", '5': "jkl",
+        '6': "mno", '7': "pqrs", '8': "tuv", '9': "wxyz"
+    }
+    let len = digits.length, result = []
+    if (len === 0) return []
+    const func = (pos, str) => {
+        if (pos === len) result.push(str)
+        else {
+            let letters = digitsMapper[digits[pos]]
+            for (let i = 0; i < letters.length; i++)
+                func(pos + 1, str + letters[i])
+        }
+    }
+    func(0, "")
+    return result
+};
+//#endregion
+
+//#region #19 Remove Nth Node From End of List
+/** 
+ * Definition for singly-linked list.
+ * function ListNode(val, next) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.next = (next===undefined ? null : next)
+ * }
+ *
+ * @param {ListNode} head
+ * @param {number} n
+ * @return {ListNode}
+ */
+var removeNthFromEnd = function (head, n) {
+    const countLen = (listNode) => {
+        let result = 0;
+        let current = listNode;
+        while (current !== null) {
+            result++;
+            current = current.next;
+        }
+        return result;
+    }
+    const deleteNode = (listNode, index) => {
+        let currIndex = 1;
+        let current = listNode;
+        if (index < 0) {
+            return '';
+        }
+        if (index === 0) {
+            head = head.next;
+        } else {
+            while (current != null && currIndex < index) {                
+                current = current.next;
+                currIndex++;
+            }
+            current.next = current.next.next;            
+        }
+        return head;
+    }
+    let delPosition = countLen(head) - n;
+    return deleteNode(head, delPosition)
+};
+//#endregion
+
+//#region #20 Valid Parentheses
+/** 
+ * @param {string} s
+ * @return {boolean}
+ */
+ var isValid = function (s) {
+    let matchArr = ['(', '[', '{'];
+    let matchMapper = {
+        ')': '(',
+        ']': '[',
+        '}': '{'
+    };
+    let compareStack = [];
+    for (let i = 0; i < s.length; i++) {
+        let sChar = s[i];
+        let compareValue = matchMapper[sChar];
+        if (compareValue !== undefined) {
+            if (!compareStack.some(c => c) || compareStack.pop() !== compareValue)
+                return false;
+        }
+        else if (matchArr.some(s => s === sChar)) {
+            compareStack.push(sChar);
+        }
+    }
+    return !compareStack.some(c => c);
+}
+//#endregion
+
+//#region #21 Merge Two Sorted Lists
+/** 
+ * Definition for singly-linked list.
+ * function ListNode(val, next) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.next = (next===undefined ? null : next)
+ * }
+ * @param {ListNode} l1
+ * @param {ListNode} l2
+ * @return {ListNode}
+ */
+var mergeTwoLists = function (l1, l2) {
+    const getVal = (listNode) => {
+        let result = [];
+        let curr = listNode;
+        while (curr !== null) {
+            result.push(curr.val);
+            curr = curr.next;
+        }
+        return result
+    }
+    if (l1 == null) return l2;
+    if (l2 == null) return l1;
+    let combine = getVal(l1).concat(getVal(l2));
+    combine.sort((a, b) => a - b);
+    let newListNode = combine.map(n => new ListNode(n));
+    for (let i = newListNode.length - 2; i >= 0; i--) {
+        newListNode[i].next = newListNode[i + 1]
+    }
+    return newListNode[0];
+};
+var mergeTwoLists = function (l1, l2) {
+    if (l1 == null) return l2;
+    if (l2 == null) return l1;
+
+    let result = new ListNode();
+    let curr = new ListNode();
+    let prev = curr;
+    while (l1 !== null && l2 !== null) {
+        val1 = l1.val;
+        val2 = l2.val;
+        if (val1 < val2) {
+            curr.next = l1;
+            l1 = l1.next;
+        }else{
+            curr.next = l2;
+            l2 = l2.next;
+        }        
+        curr = curr.next
+    }
+    if(l1===null){
+        curr.next = l2;
+    }else if(l2===null){
+        curr.next = l1;
+    }
+    return prev.next;
+}
+//#endregion
+
+//#region #22 Generate Parentheses
+/** 
+ * @param {number} n
+ * @return {string[]}
+ */
+var generateParenthesis = function (n) {
+    const result = [];
+    breadthFirstSearch("", 0, 0);
+    return result;
+    function breadthFirstSearch(str, left, right) {
+        if (left === n && right === n) {
+            result.push(str);
+            return;
+        }
+        if (left !== n) {
+            breadthFirstSearch(str + "(", left + 1, right);
+        }
+        if (left > right) {
+            breadthFirstSearch(str + ")", left, right + 1);
+        }
+    }
+};
+//#endregion
+
+//#region #23 Merge k Sorted Lists
+/** 
+ * Definition for singly-linked list.
+ * function ListNode(val, next) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.next = (next===undefined ? null : next)
+ * }
+ * @param {ListNode[]} lists
+ * @return {ListNode}
+ */
+var mergeKLists = function (lists) {
+    const getVal = (listNode) => {
+        let result = [];
+        let curr = listNode;
+        while (curr !== null) {
+            result.push(curr.val);
+            curr = curr.next;
+        }
+        return result
+    }
+    if (lists.length === 0) return new ListNode(0).next;
+    let combine = lists.reduce((prev, curr) => {
+        prev = prev.concat(getVal(curr));
+        return prev;
+    }, []);
+    if (combine.length === 0) return new ListNode(0).next;
+    combine.sort((a, b) => a - b);
+    let newListNode = combine.map(n => new ListNode(n));
+    for (let i = newListNode.length - 2; i >= 0; i--) {
+        newListNode[i].next = newListNode[i + 1]
+    }
+    return newListNode[0];
+};
+//#endregion
+
+//#region #31 Next Permutation
+/** 
+ * @param {number[]} nums
+ * @return {void} Do not return anything, modify nums in-place instead.
+ */
+ var nextPermutation = function(nums) {
+    let i = nums.length - 2;
+    while (i >= 0 && nums[i + 1] <= nums[i]) {
+        i--;
+    }
+    if (i >= 0) {
+        let j = nums.length - 1;
+        while (j >= 0 && nums[j] <= nums[i]) {
+            j--;
+        }
+        swap(nums, i, j);
+    }
+    reverse(nums, i + 1);
+    function reverse(nums, start) {
+        let i = start, j = nums.length - 1;
+        while (i < j) {
+            swap(nums, i, j);
+            i++;
+            j--;
+        }
+    }
+    function swap(nums, i, j) {
+        let temp = nums[i];
+        nums[i] = nums[j];
+        nums[j] = temp;
+    }
+};
+//#endregion
+
+//#region #32 Longest Valid Parentheses
+/** 
+ * @param {string} s
+ * @return {number}
+ */
+var longestValidParentheses = function (s) {
+    let res = 0, left = 0, right = 0;
+
+    for (let i = 0; i < s.length; i++) {
+        if (s[i] === '(') left++;
+        else if (s[i] === ')') right++;
+
+        if (left === right) res = Math.max(res, (left + right));
+
+        if (right > left) {
+            left = 0;
+            right = 0;
+        }
+    }
+    left = 0, right = 0;
+    for (let i = (s.length - 1); i >= 0; i--) {
+        if (s[i] === '(') left++;
+        else if (s[i] === ')') right++;
+
+        if (left === right) res = Math.max(res, (left + right));
+
+        if (right < left) {
+            left = 0;
+            right = 0;
+        }
+    }
+    return res;
+};
+//#endregion
+
+//#region #33 Search in Rotated Sorted Array
+/** 
+ * @param {number[]} nums
+ * @param {number} target
+ * @return {number}
+ */
+var search = function (nums, target) {
+    let res = -1;
+    let n = nums.length;
+    for (let i = 0; i < n; i++) {
+        const num = nums[i];
+        if (num === target) return res + i + 1;
+        if (num > nums[i + 1] && (target > nums[n - 1])) return res;
+    }
+    return res;
+};
+//#endregion
+
+//#region #34 Find First and Last Position of Element in Sorted Array
+/** 
+ * @param {number[]} nums
+ * @param {number} target
+ * @return {number[]}
+ */
+var searchRange = function (nums, target) {
+    let start = -1,end = -1;
+    let n = nums.length;
+    for (let i = 0; i < n; i++) {
+        const num = nums[i];
+        if (num === target) {
+            if (start === -1) {
+                start = i;
+                end = i;
+            } else {
+                end = i;
+            }
+        }
+    }
+    return [start,end]
+};
+//#endregion
+
+//#region #39 Combination Sum
+/** 
+ * @param {number[]} candidates
+ * @param {number} target
+ * @return {number[][]}
+ */
+var combinationSum = function (candidates, target) {
+    let result = [],out = [];
+    recursionSum(target, 0, out, result)
+    function recursionSum(target, start, out) {
+        if (target < 0) return;
+        if (target == 0) { result.push(out.slice()); return; }
+        for (let i = start; i < candidates.length; i++) {
+            out.push(candidates[i]);
+            recursionSum(target - candidates[i], i, out);
+            out.pop();
+        }
+    }
+    return result;
+};
+//#endregion
+
+//#region #41 First Missing Positive
+/** 
+ * @param {number[]} nums
+ * @return {number}
+ */
+ var firstMissingPositive = function (nums) {
+    let result = 1;
+    nums.sort((a, b) => a - b).some((num, i, self) => {
+        if (num > 0) {
+            if (num > result) return true;
+            if (num != self[i + 1]) result++;
+        }
+
+    });
+    return result;
+};
+//#endregion
+
+//#region #42 Trapping Rain Water
+/** 
+ * @param {number[]} height
+ * @return {number}
+ */
+var trap = function (height) {
+    let result = 0;
+    let left = 0, right = (height.length - 1);
+    let leftMax = height[left], rightMax = height[right];
+    while (left < right) {
+        if (leftMax > rightMax) {
+            right--;
+            rightMax = Math.max(rightMax, height[right]);
+            result += rightMax - height[right];
+        } else {
+            left++;
+            leftMax = Math.max(leftMax, height[left]);
+            result += leftMax - height[left];
+        }
+    }
+    return result;
+}
+//#endregion
+
+//#region #45 Jump Game II
+/** 
+ * @param {number[]} nums
+ * @return {number}
+ */
+var jump = function (nums) {
+    let count = 0, n = nums.length, last = 0, curr = 0;
+    for (let i = 0; i < n - 1; i++) {
+        curr = Math.max(curr, i + nums[i]);
+        if (i === last) {
+            last = curr;
+            count++;
+            if (curr >= n - 1) break;
+        }
+    }
+    return count;
+};
+//#endregion
+
+//#region #46 Permutations
+/** 
+ * @param {number[]} nums
+ * @return {number[][]}
+ */
+var permute = function (nums) {
+    let len = nums.length;
+    let result = [[]];
+    if (len === 1) return [nums];
+    for (let i = 0; i < len; i++) {
+        recursionOrder(nums[i]);
+    }
+    return result;
+    function recursionOrder(str) {
+        let n = result[0].length;
+        let count = 0;
+        let newR = [];
+        if (n === 0) return result = [[str]];
+        for (let i = 0; i < result.length; i++) {
+            const arr = result[i];
+            while (count <= n) {
+                if (count === 0) {
+                    newR.push([str].concat(arr));
+                }
+                else if (count === n) {
+                    newR.push(arr.concat([str]));
+                }
+                else {
+                    newR.push(arr.slice(0, count).concat([str]).concat(arr.slice(count, n)));
+                }
+                count++;
+            }
+            count = 0;
+        }
+        result = newR.slice();
+    }
+};
+//#endregion
+
+//#region #48 Rotate Image
+/** 
+ * @param {number[][]} matrix
+ * @return {void} Do not return anything, modify matrix in-place instead.
+ */
+ var rotate = function (matrix) {
+    let n = matrix.length;
+    for (let i = 0; i < n / 2; i++) {
+        for (let j = i; j < n - 1 - i; j++) {
+            let tmp = matrix[i][j];
+            matrix[i][j] = matrix[n - 1 - j][i];
+            matrix[n - 1 - j][i] = matrix[n - 1 - i][n - 1 - j];
+            matrix[n - 1 - i][n - 1 - j] = matrix[j][n - 1 - i];
+            matrix[j][n - 1 - i] = tmp;
+        }
+    }
+};
+//#endregion
+
+//#region #49 Group Anagrams
+/** 
+ * @param {string[]} strs
+ * @return {string[][]}
+ */
+var groupAnagrams = function (strs) {
+    let groupsMapper = {}
+    strs.forEach(str => {
+        let sort = str.split('').sort().join('');
+        if (!groupsMapper[sort]) {
+            groupsMapper[sort] = [str]
+        } else {
+            groupsMapper[sort].push(str)
+        }
+    })
+    return Object.values(groupsMapper);
+};
+//#endregion
+
+//#region #53 Maximum Subarray
+/** #53
+ * @param {number[]} nums
+ * @return {number}
+ */
+var maxSubArray = function (nums) {
+    let curr = nums[0];
+    let max = nums[0];
+    for (let i = 0; i < (nums.length - 1); i++) {
+        let n = curr + nums[i + 1];
+        curr = n > nums[i + 1] ? n : nums[i + 1];
+        max = max > curr ? max : curr;
+    }
+    return max;
+};
+//#endregion
+
+//#region #55 Jump Game
+/** 
+ * @param {number[]} nums
+ * @return {boolean}
+ */
+var canJump = function (nums) {
+    let len = nums.length;    
+    let max = 0;
+    for(let i = 0; i < len; i++)
+    {
+        if(i > max) return false;
+        if(max > len) return true;
+        max = Math.max(max, nums[i] + i);
+    }    
+    return true;
+};
+//#endregion
+
+//#region #56 Merge Intervals
+/** 
+ * @param {number[][]} intervals
+ * @return {number[][]}
+ */
+var merge = function (intervals) {
+    intervals = intervals.sort((a, b) => a[0] - b[0]);
+    let result = [intervals[0]];
+    let len = intervals.length;
+    for (let i = 1; i < len; i++) {
+        let curr = result.pop();
+        let next = intervals[i];
+        if (curr[0] === next[0] && curr[1] === next[1]) {
+            result.push(curr);
+        } else {
+            let min = curr[0] > next[0] ? next[0] : curr[0];
+            let max = curr[1] < next[0] ? curr[1] : Math.max(curr[1], next[1]);
+
+            if (curr[0] !== min || curr[1] !== max) {
+                result.push([min, max]);
+            }
+            else if (next[0] >= min && next[1] <= max) {
+                result.push([min, max]);
+            }
+            else {
+                result.push(curr);
+                result.push(next);
+            }
+        }
+    }
+    return result;
+};
+//#endregion
+
+//#region #62 Unique Paths
+/** 
+ * @param {number} m
+ * @param {number} n
+ * @return {number}
+ */
+var uniquePaths = function (m, n) {
+    let dp = [];
+    dp.length = n;
+    dp.fill(1);
+    for (let i = 1; i < m; ++i) {
+        for (let j = 1; j < n; ++j) {
+            dp[j] += dp[j - 1];
+        }
+    }
+    return dp[n - 1];
+};
+//#endregion
+
+//#region #64 Minimum Path Sum
+/** 
+ * @param {number[][]} grid
+ * @return {number}
+ */
+var minPathSum = function (grid) {
+    let m = grid.length, n = grid[0].length;
+    let dp = Array.from({ length: m }, e => Array(n).fill(0));
+    dp[0][0] = grid[0][0];
+
+    for (let i = 1; i < m; i++)dp[i][0] = dp[i - 1][0] + grid[i][0];
+    for (let i = 1; i < n; i++)dp[0][i] = dp[0][i - 1] + grid[0][i];
+
+    for (let i = 1; i < m; i++) {
+        for (let j = 1; j < n; j++) {
+            dp[i][j] = Math.min(dp[i - 1][j], dp[i][j - 1]) + grid[i][j];
+        }
+    }
+    return dp[m - 1][n - 1];
+};
+//#endregion
+
+//#region #70 Climbing Stairs
+/** 
+ * @param {number} n
+ * @return {number}
+ */
+var climbStairs = function (n) {
+    let obj = { prev: 0, curr: 1, next: 0 };
+    for (let i = 0; i < n; i++) {
+        Accumulate(obj);        
+    }
+    return obj.next;
+
+    function Accumulate(o) {
+        o.next = o.prev + o.curr;
+        o.prev = o.curr;
+        o.curr = o.next;
+    }
+};
+var climbStairs = function (n) {
+    let arr = [0, 1];
+    for (let i = 0; i < n; i++) {
+        Accumulate(arr);
+    }
+    return arr.pop();
+
+    function Accumulate() {
+        let n = arr.length - 1;
+        arr.push(arr[n] + arr[n - 1]);
+    }
+};
+//#endregion
+
+//#region #72 Edit Distance
+/** 
+ * @param {string} word1
+ * @param {string} word2
+ * @return {number}
+ */
+var minDistance = function (word1, word2) {
+    let m = word1.length, n = word2.length;
+    let dp = Array.from({ length: m + 1 }, e => Array(n + 1).fill(0));
+    for (let i = 0; i <= m; i++) dp[i][0] = i;
+    for (let i = 0; i <= n; i++) dp[0][i] = i;
+    for (let i = 1; i <= m; i++) {
+        for (let j = 1; j <= n; j++) {
+            if (word1[i - 1] === word2[j - 1]) {
+                dp[i][j] = dp[i - 1][j - 1];
+            } else {
+                dp[i][j] = Math.min(dp[i - 1][j - 1], Math.min(dp[i - 1][j], dp[i][j - 1])) + 1;
+            }
+        }
+    }
+    return dp[m][n];
+};
+//#endregion
+
+//#region #75 Sort Colors
+/** 
+ * @param {number[]} nums
+ * @return {void} Do not return anything, modify nums in-place instead.
+ */
+var sortColors = function (nums) {
+    if (nums.length === 1) return;
+    let red = 0, blue = nums.length - 1;
+    while (nums[red] === 0) red++;
+    while (nums[blue] === 2) blue--;
+    for (let i = red; i <= blue; i++) {
+        let num = nums[i];
+        if (num === 0) {
+            swap(red++, i);
+        } else if (num === 2) {
+            while (nums[blue] === 2) blue--;
+            if (blue < i) return;
+            swap(i, blue--);
+            if (nums[i] === 0) {
+                swap(red++, i);
+            }
+        }
+    }
+    function swap(i, j) {
+        let temp = nums[i];
+        nums[i] = nums[j];
+        nums[j] = temp;
+    }
+};
+//#endregion
+
+//#region #76 Minimum Window Substring
+/** 
+ * @param {string} s
+ * @param {string} t
+ * @return {string}
+ */
+var minWindow = function (s, t) {
+    if (t.length > s.length) return "";
+
+    const tMap = {};
+    for (let c of t) {
+        if (tMap[c] === undefined) tMap[c] = 0;
+        tMap[c] += 1;
+    }
+
+    let minStart = 0;
+    let minLen = Number.MAX_VALUE;
+    let counter = t.length;
+
+    let l = 0, r = 0;
+
+    while (r < s.length) {
+        if (tMap[s[r]] > 0) counter--;
+        if (tMap[s[r]] != null) tMap[s[r]]--;
+        r++;
+
+        while (counter === 0) {
+            if (r - l < minLen) {
+                minStart = l;
+                minLen = r - l;
+            }
+            if (tMap[s[l]] != null) tMap[s[l]]++;
+            if (tMap[s[l]] > 0) counter++;
+
+            l++;
+        }
+    }
+
+    if (minLen === Number.MAX_VALUE) return "";
+
+    return s.substr(minStart, minLen);
+};
+//#endregion
+
+//#region #78 Subsets
+/** 
+ * @param {number[]} nums
+ * @return {number[][]}
+ */
+var subsets = function (nums) {
+    let n = nums.length;
+    let result = [[]];
+    loop([], 0);
+    return result;
+
+    function loop(prev, start) {
+        for (let i = start; i < n; i++) {
+            let curr = prev.slice();
+            curr.push(nums[i]);
+            result.push(curr);
+            if (i + 1 < n) loop(curr, i + 1);
+        }
+    }
+};
+//#endregion
+
+//#region #79 Word Search
+/** 
+ * @param {character[][]} board
+ * @param {string} word
+ * @return {boolean}
+ */
+var exist = function (board, word) {
+    let m = board.length, n = board[0].length;
+    if ((m * n) < word.length) return false;
+    let words = word.split("");
+    let matchPosition = [];
+    board.forEach((str, i) => {
+        let w = words[0];
+        str.forEach((c, j) => {
+            if (c === w) matchPosition.push([i, j])
+        })
+    })
+    if (matchPosition.length === 0) return false;
+    return matchPosition.some(arr => {
+        let map = {};
+        let [x, y] = arr;
+        map[words[0]] = [[x, y]];
+        return loop(1, x, y, map);
+    })
+    function loop(index, x, y, map) {
+        if (index === word.length) return true;
+        for (let i = index; i < words.length; i++) {
+            let currStr = words[index];
+            if (board[x][y + 1] === currStr && check(currStr, [x, y + 1], map)) {
+                if (loop(index + 1, x, y + 1, map)) return true;
+            }
+            if (board[x][y - 1] === currStr && check(currStr, [x, y - 1], map)) {
+                if (loop(index + 1, x, y - 1, map)) return true;
+            }
+            if (x + 1 < m && board[x + 1][y] === currStr && check(currStr, [x + 1, y], map)) {
+                if (loop(index + 1, x + 1, y, map)) return true;
+            }
+            if (x - 1 >= 0 && board[x - 1][y] === currStr && check(currStr, [x - 1, y], map)) {
+                if (loop(index + 1, x - 1, y, map)) return true;
+            }
+            map[words[index - 1]].pop();
+            return false;
+        }
+    }
+    function check(str, position, map) {
+        let oldPosition = map[str];
+        if (oldPosition) {
+            if (oldPosition.some(arr => arr[0] === position[0] && arr[1] === position[1])) {
+                return false;
+            } else {
+                map[str].push(position);
+            }
+        }
+        else {
+            map[str] = [position];
+        }
+        return true;
+    }
+};
+//#endregion
+
+//#region #84 Largest Rectangle in Histogram
+/** 
+ * @param {number[]} heights
+ * @return {number}
+ */
+var largestRectangleArea = function (heights) {
+    let result = 0, stack = [-1];
+    heights.push(0);
+    for (let i = 0; i < heights.length; i++) {
+        while (stack.length !== 0 && heights[stack[stack.length - 1]] > heights[i]) {
+            let curr = stack.pop();
+            let prev = stack.length === 0 ? curr : stack[stack.length - 1];
+            result = Math.max(result, heights[curr] * (i - prev - 1));
+        }
+        stack.push(i);
+    }
+    return result
+};
+//#endregion
+
+//#region #85 Maximal Rectangle
+/** 
+ * @param {character[][]} matrix
+ * @return {number}
+ */
+var maximalRectangle = function (matrix) {
+    if (matrix.length === 0) return 0;
+    let result = 0;
+    transBars(matrix).forEach(row => {
+        result = Math.max(result, largestRectangleArea(row));
+    })
+    return result;
+
+    function transBars(matrix) {
+        let rows = matrix.length, columns = matrix[0].length;
+        let dp = Array.from({ length: rows }, e => Array(columns).fill(0));
+        for (let c = 0; c < columns; c++) {
+            for (let r = 0; r < rows; r++) {
+                if (matrix[r][c] === "1") {
+                    if (r === 0) dp[r][c] = 1;
+                    else dp[r][c] = dp[r - 1][c] + 1;
+                }
+            }
+        }
+        return dp;
+    }
+    function largestRectangleArea(heights) {
+        let result = 0, stack = [-1];
+        heights.push(0);
+        for (let i = 0; i < heights.length; i++) {
+            while (stack.length !== 0 && heights[stack[stack.length - 1]] > heights[i]) {
+                let curr = stack.pop();
+                let prev = stack.length === 0 ? curr : stack[stack.length - 1];
+                result = Math.max(result, heights[curr] * (i - prev - 1));
+            }
+            stack.push(i);
+        }
+        return result
+    };
+};
+//#endregion
+
+//#region #94 Binary Tree Inorder Traversal
+/** 
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ * @param {TreeNode} root
+ * @return {number[]}
+ */
+var inorderTraversal = function (root) {
+    let res = [];
+    inorder(root, res);
+    return res;
+
+    function inorder(root, res) {
+        if (root == null) return;
+        inorder(root.left, res);
+        res.push(root.val);
+        inorder(root.right, res);
+    }
+};
+//#endregion
+
+//#region #96 Unique Binary Search Trees
+/** 
+ * @param {number} n
+ * @return {number}
+ */
+var numTrees = function (n) {
+    let dp = Array.from({ length: n + 1 }).fill(0);
+    dp[0] = 1;
+    for (let i = 1; i <= n; i++) {
+        for (let j = 0; j < i; j++) {
+            dp[i] += dp[j] * dp[i - j - 1];
+        }
+    }
+    return dp[n];
+};
+//#endregion
+
+//#region #98 Validate Binary Search Tree
+/** 
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ * @param {TreeNode} root
+ * @return {boolean}
+ */
+var isValidBST = function (root) {
+    isValid(root, null, null);
+    isValid2(root);
+
+    function isValid(root, min, max) {
+        if (root === null) return true;
+        if (min !== null && root.val <= min) return false;
+        if (max !== null && root.val >= max) return false;
+        return isValid(root.left, min, root.val) && isValid(root.right, root.val, max);
+    }
+
+    let last = null;
+    function isValid2(root) {
+        if (root === null) return true;
+        if (!isValid2(root.left)) return false;
+        if (last !== null && root.val <= last.val) return false;
+        last = root;
+        return isValid2(root.right);
+    }
+};
+//#endregion
+
+//#region #101 Symmetric Tree
+/** 
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ * @param {TreeNode} root
+ * @return {boolean}
+ */
+var isSymmetric = function (root) {
+    let res = [];
+    inorder(root, res);
+    let len = res.length;
+    let median = (len - 1) / 2;
+    if (res[median] !== root.val || (root.left && root.right && root.left.val !== root.right.val)) return false;
+    for (let i = 0, j = (len - 1); i < median; i++, j--) {
+        if (res[i] !== res[j]) return false;
+    }
+    return true;
+
+    function inorder(root, res) {
+        if (root === null) return;
+        inorder(root.left, res);
+        if (root.right && root.left === null) res.push(null);
+        res.push(root.val);
+        if (root.left && root.right === null) res.push(null);
+        inorder(root.right, res);
+    }
+};
+//#endregion
+
+//#region #102 Binary Tree Level Order Traversal
+/** 
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ *}
+ * @param {TreeNode} root
+ * @return {number[][]}
+ */
+var levelOrder = function (root) {
+    if (root === null) return [];
+    let levelObj = {};
+    let result = [[root.val]];
+    rangeLevel(root, 1);
+    Object.values(levelObj).forEach(o => result.push(o));
+    return result;
+
+    function rangeLevel(root, level) {
+        if (root === null) return;
+        let rangeArr = [];
+        if (root.left !== null) {
+            rangeArr.push(root.left.val);
+            rangeLevel(root.left, level + 1);
+        }
+        if (root.right !== null) {
+            rangeArr.push(root.right.val);
+            rangeLevel(root.right, level + 1);
+        }
+        if (rangeArr.length !== 0) {
+            let arr = levelObj[level];
+            if (arr === undefined) {
+                arr = rangeArr;
+            } else {
+                arr = arr.concat(rangeArr);
+            }
+            levelObj[level] = arr;
+        }
+    }
+};
+//#endregion
+
+//#region #104 Maximum Depth of Binary Tree
+/** 
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ * @param {TreeNode} root
+ * @return {number}
+ */
+var maxDepth = function (root) {
+    let maxLevel = 0;
+    depthRecursion(root, 0);
+    return maxLevel;
+
+    function depthRecursion(root, level) {
+        if (root === null) return maxLevel = Math.max(maxLevel, level);;
+        depthRecursion(root.left, level + 1);
+        depthRecursion(root.right, level + 1);
+    }
+};
+//#endregion
+
+//#region #105 Construct Binary Tree from Preorder and Inorder Traversal
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ * @param {number[]} preorder
+ * @param {number[]} inorder
+ * @return {TreeNode}
+ */
+var buildTree = function (preorder, inorder) {
+    //比較第一個數字是否相同
+    //相同代表left = null
+    //不相同則將第一個數字進inorder分出左右
+    //重複以上
+    return buildNode(preorder, 0, (preorder.length - 1), inorder, 0, (inorder.length - 1));
+
+    function buildNode(preorder, pLeft, pRight, inorder, iLeft, iRight) {
+        if (pLeft > pRight || iLeft > iRight) return null;
+        let i = 0;
+        for (i = iLeft; i <= iRight; i++) {
+            if (preorder[pLeft] === inorder[i]) break;
+        }
+        let curr = new TreeNode(preorder[pLeft]);
+        curr.left = buildNode(preorder, (pLeft + 1), (pLeft + i - iLeft), inorder, iLeft, (i - 1));
+        curr.right = buildNode(preorder, (pLeft + i - iLeft + 1), pRight, inorder, (i + 1), iRight);
+        return curr;
+    }
+};
+//#endregion
+
+//#region #108 Convert Sorted Array to Binary Search Tree
+/** 
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ * @param {number[]} nums
+ * @return {TreeNode}
+ */
+var sortedArrayToBST = function (nums) {
+    return buildNode(nums, 0, nums.length);
+
+    function buildNode(temp, start, end) {
+        if (start >= end) return null;
+        else {
+            var median = Math.floor((start + end) / 2);
+            var result = new TreeNode(temp[median]);
+            result.left = buildNode(temp, start, median);
+            result.right = buildNode(temp, median + 1, end);
+            return result;
+        }
+    }
+};
+//#endregion
+
+//#region #114 Flatten Binary Tree to Linked List
+/** 
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ * @param {TreeNode} root
+ * @return {void} Do not return anything, modify root in-place instead.
+ */
+var flatten = function (root) {
+    if (!root || (!root.left && !root.right)) return;
+    if (root.left) flatten(root.left);
+    if (root.right) flatten(root.right);
+
+    const tmpRight = root.right;
+    root.right = root.left;
+    root.left = null;
+
+    while (root.right) root = root.right;
+    root.right = tmpRight;
+};
+//#endregion
+
+//#region #121 Best Time to Buy and Sell Stock
+/** 
+ * @param {number[]} prices
+ * @return {number}
+ */
+var maxProfit = function (prices) {
+    let min = Number.MAX_VALUE, profit = 0;
+
+    for (let i = 0; i < prices.length; i++) {
+        if (prices[i] < min) min = prices[i];
+        profit = Math.max(profit, prices[i] - min);
+    }
+    return profit;
+};
+//#endregion
+
+//#region #124 Binary Tree Maximum Path Sum
+/** 
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ * @param {TreeNode} root
+ * @return {number}
+ */
+var maxPathSum = function (root) {
+    let result = root.val;
+    dfs(root);
+    return result;
+
+    function dfs(n) {
+        let l = (n.left != null) ? dfs(n.left) : 0;
+        let r = (n.right != null) ? dfs(n.right) : 0;
+        let m = n.val;
+        m = Math.max(m, (Math.max(l, r) + m));
+
+        if (m > l + r + n.val) result = Math.max(result, m);
+        else result = Math.max(result, l + r + n.val);
+        return m;
+    }
+};
+//#endregion
+
+//#region #128 Longest Consecutive Sequence
+/** 
+ * @param {number[]} nums
+ * @return {number}
+ */
+var longestConsecutive = function (nums) {
+    if (nums.length === 0) return 0;
+    let sortArr = nums.sort((a, b) => a - b);
+    let curr = sortArr[0], count = 1, result = 0;
+
+    for (let i = 1; i < sortArr.length; i++) {
+        let num = sortArr[i];
+        if (curr === num) { }
+        else if (curr + 1 === num) {
+            count++;
+            curr++;
+        }
+        else {
+            result = Math.max(result, count);
+            count = 1;
+            curr = num;
+        }
+    }
+    return Math.max(result, count);
+};
+//#endregion
+
+//#region #136 Single Number
+/** 
+ * @param {number[]} nums
+ * @return {number}
+ */
+var singleNumber = function (nums) {
+    let sortArr = nums.sort((a, b) => a - b);
+    for (let i = 0; i < sortArr.length; i++) {
+        if (sortArr[i] !== sortArr[++i]) return sortArr[i - 1];
+    }
+};
+//#endregion
+
+//#region #138 Copy List with Random Pointer
+/** 
+ * // Definition for a Node.
+ * function Node(val, next, random) {
+ *    this.val = val;
+ *    this.next = next;
+ *    this.random = random;
+ * };
+ * @param {Node} head
+ * @return {Node}
+ */
+var copyRandomList = function (head) {
+    if (!head) return null;
+    let curr = head;
+    //先將每個Node複製一份後，接在原本Node後面
+    while (curr) {
+        let copyNode = new Node(curr.val, null, null);
+        copyNode.next = curr.next;
+        curr.next = copyNode;
+        curr = copyNode.next;
+    }    
+    curr = head; //initial
+    //將複製Node.random指向正確位置
+    while (curr) {
+        if (curr.random) curr.next.random = curr.random.next;
+        curr = curr.next.next;
+    }
+    curr = head; //initial
+    let result = head.next;
+    //切斷與舊Node的連接
+    while (curr) {
+        let copyNode = curr.next;
+        curr.next = copyNode.next;
+        if (copyNode.next) copyNode.next = copyNode.next.next;
+        curr = curr.next;
+    }
+    return result;
+};
+//#endregion
+
+//#region #139 Word Break
+/** 
+ * @param {string} s
+ * @param {string[]} wordDict
+ * @return {boolean}
+ */
+var wordBreak = function (s, wordDict) {
+    let len = s.length, dp = new Array(len + 1).fill(false);
+    dp[0] = true;
+
+    let maxLen = 0;
+    wordDict.forEach(word => maxLen = maxLen < word.length ? word.length : maxLen);
+
+    for (let i = 0; i <= len; i++) {
+        for (let j = i - 1; j >= 0; j--) {
+            if (i - j > maxLen) break;
+            if (dp[j] && wordDict.includes(s.substring(j, i))) {
+                dp[i] = true;
+                break;
+            }
+        }
+    }
+    return dp[len];
+};
+//#endregion
+
+//#region #141 Linked List Cycle
+/** 
+ * Definition for singly-linked list.
+ * function ListNode(val) {
+ *     this.val = val;
+ *     this.next = null;
+ * }
+ * @param {ListNode} head
+ * @return {boolean}
+ */
+var hasCycle = function (head) {
+    let memo = new Map(), curr = head;
+    while (true) {
+        if(!curr) return false;
+        if (memo.has(curr.val)) {
+            let compare = memo.get(curr.val);
+            if (compare.some(c => c === curr)) return true;
+            else compare.push(curr);
+
+        } else {
+            memo.set(curr.val, [curr]);
+        }
+        curr = curr.next;
+    }
+};
+var hasCycle = function (head) {
+    if(!head)return false;
+    let currPoint = head, nextPonit = head.next;
+
+    while (currPoint !== nextPonit) {
+        if (currPoint === null || nextPonit === null || nextPonit.next === null) return false;
+        currPoint = currPoint.next;
+        nextPonit = nextPonit.next.next;
+    }
+    return true;
+}
+//#endregion
+
+//#region #142 Linked List Cycle II
+/** 
+ * Definition for singly-linked list.
+ * function ListNode(val) {
+ *     this.val = val;
+ *     this.next = null;
+ * }
+ * @param {ListNode} head
+ * @return {ListNode}
+ */
+var detectCycle = function (head) {
+    let noCyle = new ListNode(0).next;
+    if (!head) return noCyle;
+    let memo = new Map(), curr = head;
+    while (true) {
+        if (!curr) return noCyle;
+        if (memo.has(curr.val)) {
+            let compare = memo.get(curr.val);
+            let sameNode = compare.find(c => c === curr)
+            if (sameNode) return sameNode;
+            else compare.push(curr);
+
+        } else {
+            memo.set(curr.val, [curr]);
+        }
+        curr = curr.next;
+    }
+};
+var detectCycle = function (head) {
+    let slowNode = head, fastNode = head;
+    while (fastNode !== null) {
+        slowNode = slowNode.next;
+        fastNode = fastNode.next;
+        if (fastNode === null) return null;
+
+        fastNode = fastNode.next;
+        if (slowNode === fastNode) {
+            slowNode = head;
+            while (slowNode !== fastNode) {
+                slowNode = slowNode.next;
+                fastNode = fastNode.next;
+            }
+            return slowNode;
+        }
+    }
+    return null;
+}
+//#endregion
+
+//#region #146 LRU Cache
+/**
+ * @param {number} capacity
+ */
+var LRUCache = function (capacity) {
+    this.size = capacity;
+    this.container = new Map();
+};
+
+/** 
+ * @param {number} key
+ * @return {number}
+ */
+LRUCache.prototype.get = function (key) {
+    if (this.container.has(key)) {
+        let cacheVal = this.container.get(key);
+        this.container.delete(key);
+        this.container.set(key, cacheVal);
+        return cacheVal;
+    }
+    return -1;
+};
+
+/** 
+ * @param {number} key 
+ * @param {number} value
+ * @return {void}
+ */
+LRUCache.prototype.put = function (key, value) {
+    this.container.delete(key);
+    if (this.container.size >= this.size) {
+        let firstKey;
+        for (const [key, val] of this.container) {
+            firstKey = key;
+            break;
+        };
+        this.container.delete(firstKey);
+    }
+    this.container.set(key, value);
+};
+//#endregion
+
+//#region #148 Sort List
+/** 
+ * Definition for singly-linked list.
+ * function ListNode(val, next) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.next = (next===undefined ? null : next)
+ * }
+ * @param {ListNode} head
+ * @return {ListNode}
+ */
+var sortList = function (head) {
+    if (head === null || head.next === null) return head;
+    let curr = head;
+    let last = 0;
+    let count = 0;
+
+    while (last !== 1) {
+        while (curr.next) {
+            count++;
+            if (curr.val > curr.next.val) swap(curr);
+            curr = curr.next;
+            if (curr.next === null || count + 1 === last) {
+                last = count;
+                break;
+            }            
+        }
+        count = 0;
+        curr = head;
+    }
+    return head;
+
+    function swap(node) {
+        let temp = node.val;
+        node.val = node.next.val;
+        node.next.val = temp;
+    }
+};
+var sortList = function (head) {
+    if (!head || !head.next) return head;
+
+    const mid = getMid(head);
+    return merge(sortList(head), sortList(mid));
+
+    function getMid(node) {
+        let prev = null;
+
+        while (node && node.next) {
+            prev = (prev === null) ? node : prev.next;
+            node = node.next.next;
+        }
+        const mid = prev.next;
+        prev.next = null;
+        return mid
+    }
+
+    function merge(left, right) {
+        let merged = new ListNode();
+        let curr = merged;
+
+        while (left !== null && right !== null) {
+            if (left.val < right.val) {
+                curr.next = left;
+                left = left.next;
+            } else {
+                curr.next = right;
+                right = right.next;
+            }
+            curr = curr.next;
+        }
+        curr.next = (left === null) ? right : left;
+        return merged.next;
+    }
+};
+//#endregion
+
+//#region #152 Maximum Product Subarray
+/** 
+ * @param {number[]} nums
+ * @return {number}
+ */
+var maxProduct = function (nums) {
+    let result = nums[0], max = result, min = result;
+    for (let i = 1; i < nums.length; i++) {
+        let temp_max = max * nums[i];
+        let temp_min = min * nums[i];
+
+        max = Math.max(Math.max(temp_max, temp_min), nums[i]);
+        min = Math.min(Math.min(temp_max, temp_min), nums[i]);
+        result = Math.max(result, max);
+    }
+    return result;
+};
+//#endregion
+
+//#region #155 Min Stack
+/**
+ * initialize your data structure here.
+ */
+var MinStack = function () {
+    this._stack = [];
+    this.len = -1;
+};
+MinStack.prototype._getTop = function () {
+    return this._stack[this.len];
+}
+
+/** 
+ * @param {number} val
+ * @return {void}
+ */
+MinStack.prototype.push = function (val) {
+    let prev = this._getTop();
+    this._stack.push({
+        val: val,
+        min: prev === undefined ? val : prev.min > val ? val : prev.min
+    });
+    this.len++;
+};
+
+/**
+ * @return {void}
+ */
+MinStack.prototype.pop = function () {
+    this._stack.pop();
+    this.len--;
+};
+
+/**
+ * @return {number}
+ */
+MinStack.prototype.top = function () {
+    return this._getTop().val;
+};
+
+/**
+ * @return {number}
+ */
+MinStack.prototype.getMin = function () {
+    return this._getTop().min;
+};
+//#endregion
+
+//#region #160 Intersection of Two Linked Lists
+/**
+ * Definition for singly-linked list.
+ * function ListNode(val) {
+ *     this.val = val;
+ *     this.next = null;
+ * }
+ * @param {ListNode} headA
+ * @param {ListNode} headB
+ * @return {ListNode}
+ */
+var getIntersectionNode = function (headA, headB) {
+    let currA = headA;
+    while (currA !== null) {
+        let currB = headB;
+        while (currB !== null) {
+            if (currA === currB) return currA;
+            currB = currB.next;
+        }
+        currA = currA.next;
+    }
+    return null;
+};
+var getIntersectionNode = function (headA, headB) {
+    let currA = headA, currB = headB
+    while (currA !== currB) {
+        if (currA === null) currA = headB;
+        else currA = currA.next;
+
+        if (currB === null) currB = headA;
+        else currB = currB.next;
+    }
+    return currA;
+};
+//#endregion
+
+//#region #169 Majority Element
+/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var majorityElement = function (nums) {
+    const map = new Map();
+    let max = { number: null, count: 0 }
+    nums.forEach(num => {
+        if (map.has(num)) {
+            let count = map.get(num);
+            map.set(num, ++count);
+        } else {
+            map.set(num, 1);
+        }
+    })
+    for (const [key, value] of map) {
+        if (max.count < value) {
+            max.number = key;
+            max.count = value;
+        }
+    }
+    return max.number;
+};
+var majorityElement = function (nums) {
+    let candidate = nums[0];
+    let count = 1;
+
+    nums.forEach(num => {
+        count += num === candidate ? 1 : -1;
+        if (count === 0) {
+            candidate = num;
+            count = 1;
+        }
+    })
+    return candidate;
+};
+//#endregion
+
+//#region #189 Rotate Array
+/**
+ * @param {number[]} nums
+ * @param {number} k
+ * @return {void} Do not return anything, modify nums in-place instead.
+ */
+var rotate = function (nums, k) {
+    let len = nums.length;
+    if (k !== len) {
+        k = k % len;
+        let start = len - k;
+        nums.unshift(...nums.slice(start));
+        nums.length = len;
+    }
+};
+var rotate = function (nums, k) { // [1,2,3,4,5,6,7], 3
+    let len = nums.length;
+    k = k % len;
+
+    nums.reverse(); // [7,6,5,4,3,2,1]
+    reverse(nums, 0, k - 1); // [5,6,7,4,3,2,1]
+    reverse(nums, k, len - 1); // [5,6,7,1,2,3,4]
+    
+    function reverse(nums, start, end) {
+        while (start < end) {
+            let temp = nums[start];
+            nums[start] = nums[end];
+            nums[end] = temp;
+            start++;
+            end--;
+        }
+    }
+};
+//#endregion
+
+//#region #198 House Robber
+/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var rob = function (nums) {
+    let len = nums.length;
+    if (len === 1) return nums[0];
+    let temp_prev = nums[0], temp_next = max = Math.max(nums[0], nums[1]);
+
+    for (let i = 2; i < len; i++) {
+        max = Math.max(temp_next, temp_prev + nums[i]);
+        temp_prev = temp_next;
+        temp_next = max;
+    }
+    return max;
+};
+//#endregion
+
+//#region #199 Binary Tree Right Side View
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ * @param {TreeNode} root
+ * @return {number[]}
+ */
+var rightSideView = function (root) {
+    const recursionFind = (node, depth) => {
+        if (!node) return;
+        if (depth >= result.length) result.push(node.val);
+        recursionFind(node.right, depth + 1);
+        recursionFind(node.left, depth + 1);
+    }
+
+    if (!root) return [];
+    let result = [root.val];
+    recursionFind(root, 0);
+    return result;
+};
+//#endregion
+
+//#region #200 Number of Islands
+/**
+ * @param {character[][]} grid
+ * @return {number}
+ */
+var numIslands = function (grid) {
+    let m = grid.length, n = grid[0].length, res = 0;
+    let visited = Array.from({ length: m }, () => new Array(n));
+    for (let i = 0; i < m; i++) {
+        for (let j = 0; j < n; j++) {
+            if (grid[i][j] === '1' && !visited[i][j]){
+                helper(visited, i, j);
+                res++;
+            }            
+        }
+    }
+    return res;
+
+    function helper(visited, x, y) {
+        if (x < 0 || x >= grid.length || y < 0 || y >= grid[0].length || grid[x][y] === '0' || visited[x][y]) return;
+        visited[x][y] = true;
+        helper(visited, x - 1, y);
+        helper(visited, x + 1, y);
+        helper(visited, x, y - 1);
+        helper(visited, x, y + 1);
+    }
+};
+//#endregion
+
+//#region #206. Reverse Linked List
+/**
+ * Definition for singly-linked list.
+ * function ListNode(val, next) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.next = (next===undefined ? null : next)
+ * }
+ * @param {ListNode} head
+ * @return {ListNode}
+ */
+var reverseList = function (head) {
+    if (!head) return head;
+    let curr = head, prev_node = null;
+    while (curr) {
+        prev_node = new ListNode(curr.val, prev_node);
+        curr = curr.next;
+    }
+    return prev_node;
+};
+//#endregion
+
+//#region #207 Course Schedule
+/**
+ * @param {number} numCourses
+ * @param {number[][]} prerequisites
+ * @return {boolean}
+ */
+ var canFinish = function (numCourses, prerequisites) {
+    let courses = Array.from({ length: numCourses }, () => new Set());
+    let prereqCounts = new Array(numCourses).fill(0);
+
+    for (let i = 0; i < prerequisites.length; i++) {
+        courses[prerequisites[i][1]].add(prerequisites[i][0]);
+    }
+
+    for (let i = 0; i < numCourses; i++) {
+        let temp = Array.from(courses[i]);
+        for (let j = 0; j < temp.length; j++) prereqCounts[temp[j]]++;
+    }
+
+    for (let i = 0; i < numCourses; i++) {
+        let j;
+        for (j = 0; j < numCourses; j++) {
+            if (prereqCounts[j] === 0) break;
+        }
+        if (j === numCourses) return false;
+
+        prereqCounts[j] = -1;
+        let temp = Array.from(courses[j]);
+        for (let k = 0; k < temp.length; k++) {
+            prereqCounts[temp[k]]--;
+        }
+    }
+    return true;
+}
+//#endregion
+
+//#region #208 Implement Trie (Prefix Tree)
+/**
+ * Initialize your data structure here.
+ */
+var Trie = function () {
+    this.dictionary = {};
+};
+
+/**
+ * Inserts a word into the trie. 
+ * @param {string} word
+ * @return {void}
+ */
+Trie.prototype.insert = function (word) {
+    let temp = this.dictionary;
+    for (let i = 0; i < word.length; i++) {
+        let char = word[i];
+        if (!(char in temp)) {
+            temp[char] = { child: {}, isEnd: false };
+        }
+        if (i === (word.length - 1)) temp[char].isEnd = true;
+        temp = temp[char].child;
+    }
+};
+/**
+ * Returns if the word is in the trie. 
+ * @param {string} word
+ * @return {boolean}
+ */
+Trie.prototype.search = function (word) {
+    let temp = this.dictionary;
+    for (let i = 0; i < word.length; i++) {
+        let char = word[i];
+        if (!(char in temp)) {
+            return false;
+        }
+        if (i === (word.length - 1) && temp[char].isEnd === false) {
+            return false;
+        }
+        temp = temp[char].child;
+    }
+    return true;
+};
+/**
+ * Returns if there is any word in the trie that starts with the given prefix. 
+ * @param {string} prefix
+ * @return {boolean}
+ */
+Trie.prototype.startsWith = function (prefix) {
+    let temp = this.dictionary;
+    for (let i = 0; i < prefix.length; i++) {
+        let char = prefix[i];
+        if (!(char in temp)) {
+            return false;
+        }
+        temp = temp[char].child;
+    }
+    return true;
+};
+//#endregion
+
+//#region #215 Kth Largest Element in an Array
+/**
+ * @param {number[]} nums
+ * @param {number} k
+ * @return {number}
+ */
+var findKthLargest = function (nums, k) {
+    return nums.sort((a, b) => b - a)[k - 1];
+};
+//#endregion
+
+//#region #221 Maximal Square
+/**
+ * @param {character[][]} matrix
+ * @return {number}
+ */
+var maximalSquare = function (matrix) {
+    let m = matrix.length, n = matrix[0].length, dp = Array.from({ length: m }, () => new Array(n).fill(0)), max = 0;
+    dp[0][0] = 0;
+    if (matrix[0][0] === "1") {
+        dp[0][0] = 1;
+        max = 1;
+    }
+    for (let i = 1, j = 1; i <= m, j <= n; i++, j++) {
+        if (i < m && matrix[i][0] === "1") {
+            dp[i][0] = 1
+            max = 1;
+        }
+        if (j < n && matrix[0][j] === "1") {
+            dp[0][j] = 1;
+            max = 1;
+        }
+    }
+    for (let i = 1; i < m; i++) {
+        for (let j = 1; j < n; j++) {
+            if (matrix[i][j] === "1") {
+                let oblique = dp[i - 1][j - 1], up = dp[i - 1][j], left = dp[i][j - 1], curr = 1;
+                if (oblique !== 0 && up !== 0 && left !== 0) {
+                    let prev = Math.min(up, left) + 1;
+                    curr = Math.max(up, left);
+                    curr = prev < curr ? prev : curr;
+                    if (oblique >= up && up === left) {
+                        curr += 1;
+                    }
+                }
+                dp[i][j] = curr;
+                if (max < curr) max = curr;
+            }
+        }
+    }
+    return max * max;
+};
+//#endregion
+
+//#region #226 Invert Binary Tree
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ * @param {TreeNode} root
+ * @return {TreeNode}
+ */
+var invertTree = function (root) {
+    if (!root) return root;
+    invertTree(root.left);
+    invertTree(root.right);
+
+    [root.left, root.right] = [root.right, root.left]
+
+    return root;
+};
+//#endregion
+
+//#region #230 Kth Smallest Element in a BST
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ * @param {TreeNode} root
+ * @param {number} k
+ * @return {number}
+ */
+var kthSmallest = function (root, k) {
+    let count = 0, result;
+    return find(root, result);;
+
+    function find(node, result) {
+        if (!node) return null;
+        result = find(node.left, result);
+        if (result === null) {
+            if (k === ++count) return node.val;
+            result = find(node.right, result);
+        }
+        return result;
+    }
+};
+//#endregion
+
+//#region #234 Palindrome Linked List
+/**
+ * Definition for singly-linked list.
+ * function ListNode(val, next) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.next = (next===undefined ? null : next)
+ * }
+ * @param {ListNode} head
+ * @return {boolean}
+ */
+var isPalindrome = function (head) {
+    let len = _getLength(head), median = Math.floor(len / 2), isOdd = (len / 2 !== median), i = 1, curr = head, box = [];
+    while (curr) {
+        if (i <= median) {
+            box.push(curr.val);
+        } else if (isOdd && i === (median + 1)) {
+
+        } else {
+            if (curr.val !== box.pop()) return false;
+        }
+        i++;
+        curr = curr.next;
+    }
+    return true;
+
+    function _getLength(list) {
+        let curr = list, count = 1;
+        while (curr.next) {
+            count++;
+            curr = curr.next;
+        }
+        return count;
+    }
+};
+var isPalindrome = function (head) {
+    let fast = head, slow = head, box = [];
+    while (fast !== null && fast.next !== null) {
+        box.push(slow.val);
+        fast = fast.next.next;
+        slow = slow.next;
+    }
+    if (fast !== null) slow = slow.next;
+
+    while (slow) {
+        if (slow.val !== box.pop()) return false;
+        slow = slow.next;
+    }
+    return true;
+}
+var isPalindrome = function (head) {
+    let fast = head, slow = head, prev;
+    while (fast !== null && fast.next !== null) {
+        prev = new ListNode(slow.val, prev);
+        fast = fast.next.next;
+        slow = slow.next;
+    }
+    if (fast !== null) slow = slow.next;
+
+    while (slow) {
+        if (slow.val !== prev.val) return false;
+        slow = slow.next;
+        prev = prev.next;
+    }
+    return true;
+}
+//#endregion
+
+//#region #236 Lowest Common Ancestor of a Binary Tree
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val) {
+ *     this.val = val;
+ *     this.left = this.right = null;
+ * }
+ * @param {TreeNode} root
+ * @param {TreeNode} p
+ * @param {TreeNode} q
+ * @return {TreeNode}
+ */
+var lowestCommonAncestor = function (root, p, q) {
+    if (root === null || root === p || root === q) return root;
+    let l = lowestCommonAncestor(root.left, p, q);
+    let r = lowestCommonAncestor(root.right, p, q);
+    if (l === null || r === null) return l === null ? r : l;
+    return root;
+};
+//#endregion
+
+//#region #238 Product of Array Except Self
+/**
+ * @param {number[]} nums
+ * @return {number[]}
+ */
+ var productExceptSelf = function (nums) {
+    let zero_index = nums.indexOf(0);
+    if (zero_index !== nums.lastIndexOf(0)) {
+        return Array(nums.length).fill(0);
+    } else if (zero_index > -1) {
+        let all_product = nums.reduce((prev, curr) => {
+            if (curr === 0) curr = 1;
+            return prev * curr;
+        });
+        let temp = Array(nums.length).fill(0);
+        temp[zero_index] = all_product;
+        return temp;
+    } else {
+        let all_product = nums.reduce((prev, curr) => prev * curr);
+        return nums.map(num => (all_product / num));
+    }
+};
+var productExceptSelf = function (nums) {
+    let len = nums.length, output = Array(len).fill(0);
+    output[0] = 1
+    for (let i = 1; i < len; i++) {
+        output[i] = nums[i - 1] * output[i - 1]
+    }
+
+    let R = 1
+    for (let i = len - 1; i >= 0; i--) {
+        output[i] = output[i] * R
+        R *= nums[i]
+    }
+    return output;
+};
+//#endregion
+
+//#region #239 Sliding Window Maximum
+/**
+ * @param {number[]} nums
+ * @param {number} k
+ * @return {number[]}
+ */
+var maxSlidingWindow = function (nums, k) {
+    let len = nums.length;
+    if (k >= len) return [Math.max(...nums)];
+    let curr = nums.slice(0, k), max = Math.max(...curr), result = [max];
+    for (let i = k; i < len; i++) {
+        let num = nums[i];
+        curr.push(num);
+        if (max <= num) {
+            max = num;
+            curr.shift();
+        }
+        else if (max === curr.shift()) {
+            max = Math.max(...curr);
+        }
+        result.push(max);
+    }
+    return result;
+};
+var maxSlidingWindow = function (nums, k) {
+    const queue = [];
+    for (let i = 0; i < k; i++) {
+        while (queue.length && nums[i] >= nums[queue[queue.length - 1]]) {
+            queue.pop();
+        }
+        queue.push(i);
+    }
+
+    const res = [nums[queue[0]]];
+    for (let i = k; i < nums.length; i++) {
+        while (queue.length && nums[i] >= nums[queue[queue.length - 1]]) {
+            queue.pop();
+        }
+        queue.push(i);
+        while (queue[0] <= i - k) {
+            queue.shift();
+        }
+        res.push(nums[queue[0]]);
+    }
+    return res;
+};
+//#endregion
+
+//#region #240 Search a 2D Matrix II
+/**
+ * @param {number[][]} matrix
+ * @param {number} target
+ * @return {boolean}
+ */
+ var searchMatrix = function (matrix, target) {
+    let m = matrix.length, n = matrix[0].length, n_median = Math.floor(n / 2);
+    if (m === 1 && n === 1) return matrix[0][0] === target;
+    let x = 0, y = 0, start, end;
+
+    while (true) {
+        if (x === m) return false;
+        if (matrix[x][y] === target) return true;
+        if (y === 0) {
+            if (matrix[x][y] > target) return false;
+            y = n_median;
+            start = 0;
+            end = n;
+        }
+        if (matrix[x][y] > target) {
+            end = y;
+            y = Math.floor((y - start) / 2);
+            if (y === 0) x++;
+        }
+        else if (matrix[x][y] < target) {
+            start = y;
+            temp = start + Math.floor((end - y) / 2);
+            if (y === temp || temp >= n) {
+                x++;
+                y = 0;
+            } else {
+                y = temp;
+            }
+        }
+    }
+};
+var searchMatrix = function (matrix, target) {
+    let n = matrix[0].length - 1;
+    for (let m = 0; m < matrix.length; m++) {
+        while (n >= 0) {
+            if (target > matrix[m][n]) break;
+            if (target < matrix[m][n]) {
+                n--;
+                continue;
+            }
+            return true;
+        }
+    }
+    return false;
+};
+var searchMatrix = function (matrix, target) {
+    let m = matrix.length;
+    while (m != 0) {
+        var mid = Math.floor(m / 2);
+        var startSearchIndex = 0;
+        var i = 0;
+        if (matrix[mid][0] < target) {
+            startSearchIndex = mid;
+        }
+        while (i < m) {
+            if (matrix[i].length) {
+                if (matrix[i][0] == target) return true;
+                matrix[i] = matrix[i].slice(1);
+                if (i >= startSearchIndex) {
+                    var found = binarySearchArray(matrix[i], target)
+                    matrix.splice(i, 1)
+                }
+                if (found) return true;
+            }
+            else {
+                matrix.splice(i, 1)
+            }
+            i++;
+        }
+    }
+    return false
+
+    function binarySearchArray(arr, target) {
+        if (arr.length == 1) return arr[0] == target;
+        if (arr.length == 0) return false;
+        var mid = Math.floor(arr.length / 2);
+        if (arr[mid] > target) {
+            return binarySearchArray(arr.slice(0, mid), target)
+        }
+        else {
+            return binarySearchArray(arr.slice(mid), target)
+        }
+    }
+};
+//#endregion
+
+//#region #279 Perfect Squares
+/**
+ * @param {number} n
+ * @return {number}
+ */
+var numSquares = function (n) {
+    let min = Number.MAX_VALUE;
+    square_root(n, 1);
+    return min;
+
+    function square_root(num, count) {
+        if (count >= min) return;
+        let square_number = Math.floor(Math.sqrt(num));
+        for (let i = square_number; i > 0; i--) {
+            let temp = num - (i * i);
+            if (temp > 0) {
+                square_root(temp, count + 1);
+            } else if (temp === 0) {
+                if (min > count) min = count;
+            }
+        }
+        return;
+    }
+};
+//#endregion
+
+//#region #283 Move Zeroes
+/**
+ * @param {number[]} nums
+ * @return {void} Do not return anything, modify nums in-place instead.
+ */
+var moveZeroes = function (nums) {
+    let zeros_index = [];
+    for (let i = 0; i < nums.length; i++) {
+        let num = nums[i];
+        if (num !== 0 && i > zeros_index[0]) {
+            let zero_i = zeros_index.shift();
+            nums[zero_i] = nums[i];
+            nums[i] = 0;
+            zeros_index.push(i);
+        } else if (num === 0) zeros_index.push(i);
+    }
+};
+//#endregion
+
+//#region #287 Find the Duplicate Number
+/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var findDuplicate = function (nums) {
+    let obj = {};
+    for (let i = 0; i < nums.length; i++) {
+        let n = nums[i];
+        if (obj[n] === undefined) obj[n] = 1;
+        else return n;
+    }
+};
+var findDuplicate = function (nums) {
+    let count_arr = Array(nums.length).fill(0);
+    for (let i = 0; i < nums.length; i++) {
+        count_arr[nums[i]]++;
+        if (count_arr[nums[i]] > 1) return nums[i];
+    }
+};
+//#endregion
+
+//#region #295 Find Median from Data Stream
+/**
+ * initialize your data structure here.
+ */
+var MedianFinder = function () {
+    this.arr = [];
+};
+
+/** 
+ * @param {number} num
+ * @return {void}
+ */
+MedianFinder.prototype.addNum = function (num) {
+    const bs = n => {
+        let start = 0;
+        let end = this.arr.length;
+        while (start < end) {
+            let mid = Math.floor((start + end) / 2);
+            if (n > this.arr[mid]) start = mid + 1;
+            else end = mid;
+        }
+        this.arr.splice(start, 0, n);
+    }
+    if (this.arr.length === 0) this.arr.push(num);
+    else bs(num);
+};
+
+/**
+ * @return {number}
+ */
+MedianFinder.prototype.findMedian = function () {
+    const mid = Math.floor(this.arr.length / 2);
+    return (this.arr.length % 2 === 0) ? (this.arr[mid - 1] + this.arr[mid]) / 2 : this.arr[mid];
+};
+
+//#endregion
+
+//#region #297 Serialize and Deserialize Binary Tree
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val) {
+ *     this.val = val;
+ *     this.left = this.right = null;
+ * }
+ */
+
+/**
+ * Encodes a tree to a single string.
+ *
+ * @param {TreeNode} root
+ * @return {string}
+ */
+ var serialize = (root) => JSON.stringify(root);
+
+ /**
+  * Decodes your encoded data to tree.
+  *
+  * @param {string} data
+  * @return {TreeNode}
+  */
+ var deserialize = (data) => JSON.parse(data);
+//#endregion
+
+//#region #300 Longest Increasing Subsequence
+/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var lengthOfLIS = function (nums) {
+    let dp = [];
+    for (let i = 0; i < nums.length; i++) {
+        let left = 0, right = dp.length;
+        while (left < right) {
+            let mid = left + Math.floor((right - left) / 2);
+            if (dp[mid] < nums[i]) left = mid + 1;
+            else right = mid;
+        }
+        if (right >= dp.length) dp.push(nums[i]);
+        else dp[right] = nums[i];
+    }
+    return dp.length;
+};
+//#endregion
+
+//#region #322 Coin Change
+/**
+ * @param {number[]} coins
+ * @param {number} amount
+ * @return {number}
+ */
+ var coinChange = function (coins, amount) {
+    const dp = new Array(amount + 1);
+    dp.fill(Infinity);
+    dp[0] = 0;
+
+    for (let coin of coins) {
+        for (let i = coin; i < amount + 1; i++) {
+            let temp = dp[i - coin] + 1;
+            if (dp[i] > temp) dp[i] = temp;
+        }
+    }
+
+    return dp[amount] !== Infinity ? dp[amount] : -1;
+};
+ var coinChange = function (coins, amount) {
+    let memo = [];
+    memo[0] = 0;
+    return coinChangeDFS(coins, amount, memo);
+
+    function coinChangeDFS(coins, target, memo) {
+        if (target < 0) return - 1;
+        if (memo[target] !== undefined) return memo[target];
+        let curr = Number.MAX_VALUE;
+        for (let i = 0; i < coins.length; i++) {
+            let temp = coinChangeDFS(coins, target - coins[i], memo);
+            if (temp >= 0) if (curr > temp + 1) curr = temp + 1;
+        }
+        return memo[target] = (curr === Number.MAX_VALUE) ? -1 : curr;
+    }
+};
+//#endregion
+
+//#region #337 House Robber III
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ * @param {TreeNode} root
+ * @return {number}
+ */
+var rob = function (root) {
+    let res = dfs(root);
+    return res.prev > res.curr ? res.prev : res.curr;
+
+    function dfs(root) {
+        if (!root) return { prev: 0, curr: 0 }
+        let left = dfs(root.left);
+        let right = dfs(root.right);
+        return {
+            prev: Math.max(left.prev, left.curr) + Math.max(right.prev, right.curr),
+            curr: left.prev + right.prev + root.val
+        };
+    }
+}
+//#endregion
+
+//#region #338 Counting Bits
+/**
+ * @param {number} n
+ * @return {number[]}
+ */
+var countBits = function (n) {
+    let record = Array(n + 1).fill(1), binary = 1;
+    record[0] = 0;
+    for (let i = 2; i <= n; i++) {
+        if (i === (binary * 2)) binary *= 2;
+        record[i] += record[i - binary];
+    }
+    return record;
+};
+//#endregion
+
+//#region #347 Top K Frequent Elements
+/**
+ * @param {number[]} nums
+ * @param {number} k
+ * @return {number[]}
+ */
+var topKFrequent = function (nums, k) {
+    let count_obj = {}, result = [];
+    nums.forEach(n => {
+        if (count_obj[n] === undefined) count_obj[n] = 1;
+        else count_obj[n]++;
+    })
+    Object.entries(count_obj).sort((a, b) => b[1] - a[1]).some((o, i) => {
+        result.push(o[0]);
+        if (i === k - 1) return true;
+    })
+    return result;
+};
+//#endregion
+
+//#region #394 Decode String
+/** ab3[c]
+ * @param {string} s
+ * @return {string}
+ */
+var decodeString = function (s) {
+    let numer_mapper = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',];
+    let i = 0;
+    return helper();
+
+    function helper() {
+        let tempS = '', countS = '', countN = 0;
+        while (s[i] !== ']' && i < s.length) {
+            let char = s[i];
+            if (char === '[') {
+                countN = parseInt(countS);
+                i++;
+                tempS += helper().repeat(countN);
+                countS = '';
+            }
+            else if (numer_mapper[char] === undefined) tempS += char;
+            else countS += char;
+            i++;
+        }
+        return tempS;
+    }
+};
+//#endregion
+
+//#region #416 Partition Equal Subset Sum
+/**
+ * @param {number[]} nums
+ * @return {boolean}
+ */
+var canPartition = function (nums) {
+    let sum = nums.reduce((prev, curr) => prev += curr);
+    if (sum % 2 === 1) return false;
+    let target = sum / 2, dp = Array(sum + 1).fill(0);
+    dp[0] = 1;
+    return nums.some(num => {
+        for (let i = sum; i >= 0; i--) {
+            if (dp[i]) dp[i + num] = 1;
+        }
+        if (dp[target]) return true;
+    });
+};
+//#endregion
+
+//#region #437 Path Sum III
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ * @param {TreeNode} root
+ * @param {number} targetSum
+ * @return {number}
+ */
+var pathSum = function (root, targetSum) {
+    if (!root) return 0;
+    return helper(root, targetSum) + pathSum(root.left, targetSum) + pathSum(root.right, targetSum);
+
+    function helper(node, target) {
+        if (!node) return 0;
+
+        let count = 0;
+        count += helper(node.left, target - node.val);
+        count += helper(node.right, target - node.val);
+
+        if (node.val === target) count++;
+
+        return count;
+    }
+};
+var pathSum = function (root, targetSum) {
+    let prefixSum = [], count = 0, k = targetSum;
+
+    const preOrder = (root, sum) => {
+        if (root === null) return;
+
+        sum += root.val;
+        if (sum === k) count++;
+        count += prefixSum[sum - k] || 0;
+        prefixSum[sum] = (prefixSum[sum] || 0) + 1;
+
+        preOrder(root.left, sum);
+        preOrder(root.right, sum);
+
+        prefixSum[sum]--;
+    }
+    preOrder(root, 0);
+
+    return count;
+};
+//#endregion
+
+//#region #438 Find All Anagrams in a String
+/**
+ * @param {string} s
+ * @param {string} p
+ * @return {number[]}
+ */
+var findAnagrams = function (s, p) {
+    let p_mapper = {}, p_len = p.length, result = [];
+    for (const letter of p) {
+        if (p_mapper[letter] === undefined) p_mapper[letter] = 0;
+        p_mapper[letter]++;
+    }
+
+    for (let i = 0; i < s.length; i++) {
+        if (p_mapper[s[i]]) {
+            if (helper(Object.assign({}, p_mapper), i)) result.push(i);
+        }
+    }
+    return result;
+
+    function helper(mapper, start) {
+        for (let i = start; i < (p_len + start); i++) {
+            const letter = s[i];
+            if (!mapper[letter]) return false;
+            else if (mapper[letter] > 0) mapper[letter]--;
+        }
+        return true;
+    }
+};
+var findAnagrams = function (s, p) {
+    const result = [];
+    let map = new Map(), c1, c2;
+    for (let i = 0; i < s.length; i++) {
+        c1 = i < p.length ? p[i] : s[i - p.length];
+        c2 = s[i];
+        if (c1 !== c2) {
+            if (map.get(c1) === -1) map.delete(c1);
+            else map.set(c1, map.has(c1) ? map.get(c1) + 1 : 1);
+            if (map.get(c2) === 1) map.delete(c2);
+            else map.set(c2, map.has(c2) ? map.get(c2) - 1 : -1);
+        };
+        if (map.size === 0 && i >= p.length - 1) result.push(i - p.length + 1);
+    };
+    return result;
+};
+//#endregion
+
+//#region #448 Find All Numbers Disappeared in an Array
+/**
+ * @param {number[]} nums
+ * @return {number[]}
+ */
+var findDisappearedNumbers = function (nums) {
+    let set = new Set(nums), len = nums.length, result = [];
+    nums = Array.from(set).sort((a, b) => a - b);
+    for (let i = 0, j = 0; i < len; i++) {
+        let curr = i + 1;
+        if (curr === nums[j]) j++;
+        else result.push(curr);
+    }
+    return result;
+};
+var findDisappearedNumbers = function (nums) {
+    let all_nums = Array(nums.length + 1).fill(0), result = [];
+    all_nums[0] = 1;
+    nums.forEach(num => all_nums[num]++);
+    all_nums.forEach((num, i) => {
+        if (num === 0) result.push(i);
+    });
+    return result;
+};
+var findDisappearedNumbers = function (nums) {
+    let all_nums = new Set();
+    for (let i = 1; i <= nums.length; i++) {
+        all_nums.add(i);
+    }
+    nums.forEach(num => all_nums.delete(num));
+    return [...all_nums];
+};
+var findDisappearedNumbers = function (nums) {
+    const res = [];
+    for (let i = 0; i < nums.length; i++) {
+        const idx = Math.abs(nums[i]) - 1;
+        nums[idx] = Math.abs(nums[idx]) * -1;
+    }
+
+    for (let i = 0; i < nums.length; i++) {
+        if (nums[i] > 0) res.push(i + 1);
+    }
+    return res;
+};
+//#endregion
+
+//#region #494 Target Sum
+/**
+ * @param {number[]} nums
+ * @param {number} target
+ * @return {number}
+ */
+var findTargetSumWays = function (nums, target) {
+    let possibilities = [0], count = 0;
+    nums.forEach(num => {
+        possibilities = helper(possibilities, num);
+    })
+    possibilities.forEach(num => {
+        if (num === target) count++;
+    });
+    return count;
+    function helper(set, curr) {
+        let temp = [];
+        for (const num of set) {
+            temp.push(num + curr);
+            temp.push(num - curr);
+        }
+        return temp;
+    }
+};
+var findTargetSumWays = function (nums, target) {
+    let dp = new Map([[0, 1]]), temp = new Map();
+    for (let num of nums) {
+        for (let [key, value] of dp.entries()) {
+            let plus = key + num, minus = key - num;
+            temp.set(plus, (temp.get(plus) || 0) + value);
+            temp.set(minus, (temp.get(minus) || 0) + value);
+        }
+        dp = new Map(temp);
+        temp.clear();
+    }
+    return dp.has(target) ? dp.get(target) : 0;
+}
+//#endregion
+
+//#region #543 Diameter of Binary Tree
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ * @param {TreeNode} root
+ * @return {number}
+ */
+var diameterOfBinaryTree = function (root) {
+    let max = 0, result = counter(root) - 1;
+    return result > max ? result : max;
+
+    function counter(node) {
+        if (!node) return 0;
+        let left = counter(node.left);
+        let right = counter(node.right);
+        max = Math.max(max, (left + right));
+
+        return left > right ? left + 1 : right + 1;
+    }
+};
+//#endregion
+
+//#region #560 Subarray Sum Equals K
+/**
+ * @param {number[]} nums
+ * @param {number} k
+ * @return {number}
+ */
+ var subarraySum = function (nums, k) {
+    let sum = 0, hash = new Map([[0, 1]]), count = 0;
+
+    for (let i = 0; i < nums.length; i++) {
+        sum += nums[i]
+        if (hash.has(sum - k)) {
+            count += hash.get(sum - k);
+        }
+        hash.set(sum, (hash.get(sum) || 0) + 1)
+    }
+    return count;
+};
+//#endregion
+
+//#region #617 Merge Two Binary Trees
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ * @param {TreeNode} root1
+ * @param {TreeNode} root2
+ * @return {TreeNode}
+ */
+var mergeTrees = function (root1, root2) {
+    if (root1 && root2) {
+        return new TreeNode(root1.val + root2.val,
+            mergeTrees(root1.left, root2.left),
+            mergeTrees(root1.right, root2.right));
+    } else {
+        return root1 || root2
+    }
+};
+//#endregion
+
+//#region #621 Task Scheduler
+/**
+ * @param {character[]} tasks
+ * @param {number} n
+ * @return {number}
+ */
+var leastInterval = function (tasks, n) {
+    const counts = new Array(26).fill(0);
+    for (const task of tasks) counts[task.charCodeAt() - 65] += 1;
+    counts.sort((a, b) => b - a);
+    let max = counts[0], intervals = max * n - n;
+
+    for (let i = 1; i < counts.length; i++) {
+        if (counts[i] === 0) break;;
+        intervals -= counts[i] > max - 1 ? max - 1 : counts[i]
+    }
+    return intervals > 0 ? intervals + tasks.length : tasks.length
+};
+//#endregion
+
+//#region #647 Palindromic Substrings
+/**
+ * @param {string} s
+ * @return {number}
+ */
+var countSubstrings = function (s) {
+    let n = s.length, res = 0;
+    let dp = Array.from({ length: n }, () => Array(n).fill(false));
+    for (let i = n - 1; i >= 0; --i) {
+        for (let j = i; j < n; ++j) {
+            dp[i][j] = (s[i] == s[j]) && (j - i <= 2 || dp[i + 1][j - 1]);
+            if (dp[i][j]) ++res;
+        }
+    }
+    return res;
+};
+var countSubstrings = function (s) {
+    let count = 0, n = s.length;
+
+    for (let i = 0; i < n; i++) {
+        count += countPalindromeAroundCenter(s, i, i);
+        count += countPalindromeAroundCenter(s, i, i + 1);
+    }
+    return count;
+
+    function countPalindromeAroundCenter(s, left, right) {
+        let count = 0;
+        while (left >= 0 && right < s.length && s[left] === s[right]) {
+            left--;
+            right++;
+            count++;
+        }
+        return count;
+    }
+};
+//#endregion
+
+//#region #739 Daily Temperatures
+/**
+ * @param {number[]} temperatures
+ * @return {number[]}
+ */
+var dailyTemperatures = function (temperatures) {
+    let result = Array(temperatures.length).fill(0), stack = [0];
+
+    for (let i = 1; i < temperatures.length; i++) {
+        let curr = temperatures[i];
+        while (temperatures[stack[stack.length - 1]] < curr) {
+            let index = stack.pop();
+            result[index] = i - index;
+        }
+        stack.push(i);
+    }
+    return result;
+};
+//#endregion
+
+//#region #763 Partition Labels
+/**
+ * @param {string} s
+ * @return {number[]}
+ */
+ var partitionLabels = function (s) {
+    let result = [], curr = -1;
+    for (let i = 0; i < s.length; i++) {
+        let lastIndex = s.lastIndexOf(s[i]);
+        while (lastIndex > i) {
+            let temp = s.lastIndexOf(s[++i]);
+            if (temp > lastIndex) lastIndex = temp;
+        }
+        result.push(i - curr);
+        curr = i;
+    }
+    return result;
+};
+//#endregion
+
+
+
+
+var arrayNesting = function(nums) {
+    let record = Array(nums.length).fill(0);
+
+    for (let i = 0; i < nums.length; i++) {
+        let k = nums[i];
+        nums[k]
+        
+    }
+};
